@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Laporan Harian - Kribangs</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <style>
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: linear-gradient(to right, #f7a324, #fddc9b);
+      padding: 20px;
+    }
+    .container {
+      background: white;
+      max-width: 800px;
+      margin: auto;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+    h2 { text-align: center; color: #f7a324; }
+    label { display: block; margin-top: 10px; font-weight: bold; }
+    input, select, textarea {
+      width: 100%;
+      padding: 10px;
+      border-radius: 8px;
+      margin-top: 5px;
+      border: 1px solid #ccc;
+    }
+    .activity { margin-top: 15px; padding: 10px; background: #fffbe6; border: 1px solid #f7a324; border-radius: 10px; }
+    button {
+      background-color: #f7a324; color: white; border: none; padding: 10px;
+      border-radius: 10px; cursor: pointer; margin-top: 20px; width: 100%;
+    }
+    button:hover { background-color: #e2921f; }
+  </style>
+</head>
+<body>
+  <div class="container" id="laporan">
+    <h2>Form Laporan Harian - Kribangs</h2>
+    <label>Tanggal</label>
+    <input type="date" id="tanggal">
+    <label>Nama</label>
+    <input type="text" id="nama">
+    <label>Divisi</label>
+    <select id="divisi">
+      <option value="">-- Pilih Divisi --</option>
+      <option value="SPV">SPV</option>
+      <option value="HRD">HRD</option>
+      <option value="Finance">Finance</option>
+      <option value="Operasional Kribangs">Operasional Kribangs</option>
+      <option value="Operasional Cemilan">Operasional Cemilan</option>
+      <option value="Kanvas/Kampas">Kanvas/Kampas</option>
+    </select>
+
+    <div id="activities"></div>
+    <button onclick="addActivity()">➕ Tambah Aktivitas</button>
+  </div>
+
+  <button onclick="screenshot()">📸 Ambil Gambar Laporan</button>
+
+  <script>
+    function addActivity() {
+      const div = document.createElement('div');
+      div.className = 'activity';
+      div.innerHTML = `
+        <label>Aktivitas</label><input type="text">
+        <label>Kendala</label><input type="text">
+        <label>Solusi</label><input type="text">
+      `;
+      document.getElementById('activities').appendChild(div);
+    }
+
+    function screenshot() {
+      html2canvas(document.getElementById("laporan")).then(canvas => {
+        const link = document.createElement("a");
+        link.download = `laporan-kribangs-${Date.now()}.png`;
+        link.href = canvas.toDataURL();
+        link.click();
+      });
+    }
+
+    window.onload = addActivity;
+  </script>
+</body>
+</html>
