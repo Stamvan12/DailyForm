@@ -2,86 +2,132 @@
 <html lang="id">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Laporan Harian - Kribangs</title>
+  <title>Laporan Harian Kribangs</title>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
   <style>
     body {
-      font-family: 'Poppins', sans-serif;
-      background: linear-gradient(to right, #f7a324, #fddc9b);
+      font-family: 'Arial', sans-serif;
+      background: #fddc9b;
       padding: 20px;
     }
     .container {
       background: white;
-      max-width: 800px;
-      margin: auto;
       padding: 20px;
       border-radius: 12px;
-      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      max-width: 900px;
+      margin: auto;
     }
     h2 { text-align: center; color: #f7a324; }
-    label { display: block; margin-top: 10px; font-weight: bold; }
-    input, select, textarea {
+    label { font-weight: bold; display: block; margin-top: 10px; }
+    input, select {
       width: 100%;
-      padding: 10px;
+      padding: 8px;
       border-radius: 8px;
       margin-top: 5px;
       border: 1px solid #ccc;
     }
-    .activity { margin-top: 15px; padding: 10px; background: #fffbe6; border: 1px solid #f7a324; border-radius: 10px; }
     button {
-      background-color: #f7a324; color: white; border: none; padding: 10px;
-      border-radius: 10px; cursor: pointer; margin-top: 20px; width: 100%;
+      background: #f7a324;
+      color: white;
+      border: none;
+      padding: 10px;
+      margin-top: 15px;
+      border-radius: 10px;
+      cursor: pointer;
     }
-    button:hover { background-color: #e2921f; }
+    button:hover { background: #e2921f; }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+    }
+    th, td {
+      border: 1px solid #ccc;
+      padding: 8px;
+      text-align: center;
+    }
+    th { background-color: #f7a324; color: white; }
+    .icon { font-size: 20px; }
   </style>
 </head>
 <body>
-  <div class="container" id="laporan">
-    <h2>Form Laporan Harian - Kribangs</h2>
-    <label>Tanggal</label>
-    <input type="date" id="tanggal">
-    <label>Nama</label>
-    <input type="text" id="nama">
-    <label>Divisi</label>
-    <select id="divisi">
-      <option value="">-- Pilih Divisi --</option>
-      <option value="SPV">SPV</option>
-      <option value="HRD">HRD</option>
-      <option value="Finance">Finance</option>
-      <option value="Operasional Kribangs">Operasional Kribangs</option>
-      <option value="Operasional Cemilan">Operasional Cemilan</option>
-      <option value="Kanvas/Kampas">Kanvas/Kampas</option>
-    </select>
+<div class="container">
+  <h2>Form Laporan Harian - Kribangs</h2>
+  <label>Tanggal</label>
+  <input type="date" id="tanggal">
+  <label>Aktivitas</label>
+  <input type="text" id="aktivitas">
+  <label>Kendala</label>
+  <input type="text" id="kendala">
+  <label>Solusi</label>
+  <input type="text" id="solusi">
+  <label>Status</label>
+  <select id="status">
+    <option value="Selesai">Selesai</option>
+    <option value="Belum">Belum</option>
+  </select>
+  <label>Tindakan Lanjut</label>
+  <input type="text" id="lanjut">
+  <button onclick="tambahBaris()">➕ Tambah ke Tabel</button>
+  <button onclick="screenshot()">📸 Simpan sebagai Gambar</button>
 
-    <div id="activities"></div>
-    <button onclick="addActivity()">➕ Tambah Aktivitas</button>
+  <div id="tabel-container">
+    <table id="tabel-laporan">
+      <thead>
+        <tr>
+          <th>Tanggal</th>
+          <th>Aktivitas</th>
+          <th>Kendala</th>
+          <th>Solusi</th>
+          <th>Status</th>
+          <th>Tindakan Lanjut</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
   </div>
+</div>
 
-  <button onclick="screenshot()">📸 Ambil Gambar Laporan</button>
+<script>
+  function tambahBaris() {
+    const tanggal = document.getElementById("tanggal").value;
+    const aktivitas = document.getElementById("aktivitas").value;
+    const kendala = document.getElementById("kendala").value;
+    const solusi = document.getElementById("solusi").value;
+    const status = document.getElementById("status").value;
+    const lanjut = document.getElementById("lanjut").value;
 
-  <script>
-    function addActivity() {
-      const div = document.createElement('div');
-      div.className = 'activity';
-      div.innerHTML = `
-        <label>Aktivitas</label><input type="text">
-        <label>Kendala</label><input type="text">
-        <label>Solusi</label><input type="text">
-      `;
-      document.getElementById('activities').appendChild(div);
-    }
+    const tbody = document.querySelector("#tabel-laporan tbody");
+    const tr = document.createElement("tr");
 
-    function screenshot() {
-      html2canvas(document.getElementById("laporan")).then(canvas => {
-        const link = document.createElement("a");
-        link.download = `laporan-kribangs-${Date.now()}.png`;
-        link.href = canvas.toDataURL();
-        link.click();
-      });
-    }
+    const icon = status === "Selesai" ? "✅" : "❌";
 
-    window.onload = addActivity;
-  </script>
+    tr.innerHTML = `
+      <td>${tanggal}</td>
+      <td>${aktivitas}</td>
+      <td>${kendala}</td>
+      <td>${solusi}</td>
+      <td class="icon">${icon}</td>
+      <td>${lanjut}</td>
+    `;
+
+    tbody.appendChild(tr);
+
+    // Reset input
+    document.getElementById("aktivitas").value = "";
+    document.getElementById("kendala").value = "";
+    document.getElementById("solusi").value = "";
+    document.getElementById("lanjut").value = "";
+  }
+
+  function screenshot() {
+    html2canvas(document.getElementById("tabel-container")).then(canvas => {
+      const link = document.createElement("a");
+      link.download = `laporan_kribangs.png`;
+      link.href = canvas.toDataURL();
+      link.click();
+    });
+  }
+</script>
 </body>
 </html>
