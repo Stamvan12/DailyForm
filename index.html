@@ -1,133 +1,136 @@
-<!DOCTYPE html>
-<html lang="id">
-<head>
-  <meta charset="UTF-8">
-  <title>Laporan Harian Kribangs</title>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-  <style>
-    body {
-      font-family: 'Arial', sans-serif;
-      background: #fddc9b;
-      padding: 20px;
-    }
-    .container {
-      background: white;
-      padding: 20px;
-      border-radius: 12px;
-      max-width: 900px;
-      margin: auto;
-    }
-    h2 { text-align: center; color: #f7a324; }
-    label { font-weight: bold; display: block; margin-top: 10px; }
-    input, select {
-      width: 100%;
-      padding: 8px;
-      border-radius: 8px;
-      margin-top: 5px;
-      border: 1px solid #ccc;
-    }
-    button {
-      background: #f7a324;
-      color: white;
-      border: none;
-      padding: 10px;
-      margin-top: 15px;
-      border-radius: 10px;
-      cursor: pointer;
-    }
-    button:hover { background: #e2921f; }
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-top: 20px;
-    }
-    th, td {
-      border: 1px solid #ccc;
-      padding: 8px;
-      text-align: center;
-    }
-    th { background-color: #f7a324; color: white; }
-    .icon { font-size: 20px; }
-  </style>
-</head>
-<body>
-<div class="container">
-  <h2>Form Laporan Harian - Kribangs</h2>
-  <label>Tanggal</label>
-  <input type="date" id="tanggal">
-  <label>Aktivitas</label>
-  <input type="text" id="aktivitas">
-  <label>Kendala</label>
-  <input type="text" id="kendala">
-  <label>Solusi</label>
-  <input type="text" id="solusi">
-  <label>Status</label>
-  <select id="status">
-    <option value="Selesai">Selesai</option>
-    <option value="Belum">Belum</option>
-  </select>
-  <label>Tindakan Lanjut</label>
-  <input type="text" id="lanjut">
-  <button onclick="tambahBaris()">➕ Tambah ke Tabel</button>
-  <button onclick="screenshot()">📸 Simpan sebagai Gambar</button>
+import { useState, useRef } from "react";
+import html2canvas from "html2canvas";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Button } from "@/components/ui/button";
+import { Select, SelectTrigger, SelectContent, SelectItem } from "@/components/ui/select";
 
-  <div id="tabel-container">
-    <table id="tabel-laporan">
-      <thead>
-        <tr>
-          <th>Tanggal</th>
-          <th>Aktivitas</th>
-          <th>Kendala</th>
-          <th>Solusi</th>
-          <th>Status</th>
-          <th>Tindakan Lanjut</th>
-        </tr>
-      </thead>
-      <tbody></tbody>
-    </table>
-  </div>
-</div>
+const initialRows = [
+  { time: "08.00", task: "Absen", status: "", note: "" },
+  { time: "08.00-09.30", task: "Briefing", status: "", note: "" },
+  { time: "10.00", task: "Input pengeluaran patty cash di spreadsheet", status: "", note: "" },
+  { time: "10.30", task: "Penginputan laba rugi produksi (Mei)", status: "", note: "" },
+  { time: "11.00", task: "Input penjualan toko, grosir, kampas ke laporan harian", status: "", note: "" },
+  { time: "11.10", task: "Pencocokan bukti transfer setoran toko dan kampas", status: "", note: "" },
+  { time: "10.30", task: "Input pendapatan harian ke laporan omset & pengeluaran", status: "", note: "" },
+  { time: "12.00", task: "ISHOMA", status: "", note: "" },
+  { time: "13.00", task: "Kirim laporan harian omset ke grup Finance", status: "", note: "" },
+  { time: "13.30", task: "Input pengeluaran di Booble", status: "", note: "" },
+  { time: "14.00-16.00", task: "Perbaikan laporan laba rugi", status: "", note: "" },
+  { time: "17.00", task: "Pengisian laporan hasil kerja format baru", status: "", note: "" },
+];
 
-<script>
-  function tambahBaris() {
-    const tanggal = document.getElementById("tanggal").value;
-    const aktivitas = document.getElementById("aktivitas").value;
-    const kendala = document.getElementById("kendala").value;
-    const solusi = document.getElementById("solusi").value;
-    const status = document.getElementById("status").value;
-    const lanjut = document.getElementById("lanjut").value;
+export default function DailyReportForm() {
+  const [rows, setRows] = useState(initialRows);
+  const reportRef = useRef(null);
 
-    const tbody = document.querySelector("#tabel-laporan tbody");
-    const tr = document.createElement("tr");
+  const handleNoteChange = (index, value) => {
+    const updatedRows = [...rows];
+    updatedRows[index].note = value;
+    setRows(updatedRows);
+  };
 
-    const icon = status === "Selesai" ? "✅" : "❌";
+  const handleTimeChange = (index, value) => {
+    const updatedRows = [...rows];
+    updatedRows[index].time = value;
+    setRows(updatedRows);
+  };
 
-    tr.innerHTML = `
-      <td>${tanggal}</td>
-      <td>${aktivitas}</td>
-      <td>${kendala}</td>
-      <td>${solusi}</td>
-      <td class="icon">${icon}</td>
-      <td>${lanjut}</td>
-    `;
+  const handleTaskChange = (index, value) => {
+    const updatedRows = [...rows];
+    updatedRows[index].task = value;
+    setRows(updatedRows);
+  };
 
-    tbody.appendChild(tr);
+  const handleStatusChange = (index, value) => {
+    const updatedRows = [...rows];
+    updatedRows[index].status = value;
+    setRows(updatedRows);
+  };
 
-    // Reset input
-    document.getElementById("aktivitas").value = "";
-    document.getElementById("kendala").value = "";
-    document.getElementById("solusi").value = "";
-    document.getElementById("lanjut").value = "";
-  }
+  const addRow = () => {
+    setRows([...rows, { time: "", task: "", status: "", note: "" }]);
+  };
 
-  function screenshot() {
-    html2canvas(document.getElementById("tabel-container")).then(canvas => {
+  const deleteRow = (index) => {
+    const updatedRows = rows.filter((_, i) => i !== index);
+    setRows(updatedRows);
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    const element = reportRef.current;
+    if (element) {
+      const canvas = await html2canvas(element);
+      const image = canvas.toDataURL("image/png");
       const link = document.createElement("a");
-      link.download = `laporan_kribangs.png`;
-      link.href = canvas.toDataURL();
+      link.download = "laporan-harian.png";
+      link.href = image;
       link.click();
-    });
-  }
-</script>
-</body>
-</html>
+    }
+  };
+
+  return (
+    <form onSubmit={handleSubmit} className="p-4 space-y-4 max-w-4xl mx-auto">
+      <h2 className="text-xl font-bold">Laporan Hasil Kerja Harian</h2>
+      <div ref={reportRef} className="bg-white p-4 rounded shadow">
+        <table className="w-full border text-sm">
+          <thead>
+            <tr className="bg-gray-100">
+              <th className="border px-2 py-1">Jam</th>
+              <th className="border px-2 py-1">Kegiatan</th>
+              <th className="border px-2 py-1">Status</th>
+              <th className="border px-2 py-1">Keterangan / Kendala</th>
+              <th className="border px-2 py-1">Aksi</th>
+            </tr>
+          </thead>
+          <tbody>
+            {rows.map((row, index) => (
+              <tr key={index}>
+                <td className="border px-2 py-1">
+                  <Input
+                    value={row.time}
+                    onChange={(e) => handleTimeChange(index, e.target.value)}
+                    placeholder="Jam"
+                  />
+                </td>
+                <td className="border px-2 py-1">
+                  <Input
+                    value={row.task}
+                    onChange={(e) => handleTaskChange(index, e.target.value)}
+                    placeholder="Kegiatan"
+                  />
+                </td>
+                <td className="border px-2 py-1">
+                  <Select value={row.status} onValueChange={(value) => handleStatusChange(index, value)}>
+                    <SelectTrigger className={row.status === "Selesai" ? "bg-green-100 text-green-700" : row.status === "Belum Selesai" ? "bg-red-100 text-red-700" : ""}>
+                      {row.status || "Pilih Status"}
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="Selesai">Selesai</SelectItem>
+                      <SelectItem value="Belum Selesai">Belum Selesai</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </td>
+                <td className="border px-2 py-1">
+                  <Input
+                    value={row.note}
+                    onChange={(e) => handleNoteChange(index, e.target.value)}
+                    placeholder="Keterangan / Kendala"
+                  />
+                </td>
+                <td className="border px-2 py-1 text-center">
+                  <Button type="button" variant="destructive" size="sm" onClick={() => deleteRow(index)}>Hapus</Button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+      <div className="flex gap-4">
+        <Button type="button" onClick={addRow} variant="outline">Tambah Aktivitas</Button>
+        <Button type="submit">Kirim Laporan (Unduh Gambar)</Button>
+      </div>
+    </form>
+  );
+}
